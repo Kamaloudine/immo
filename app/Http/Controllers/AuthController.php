@@ -14,11 +14,14 @@ class AuthController extends Controller
     public function register(Request $request)
     {
     	//Validate data
-        $data = $request->only('name', 'email', 'password');
+        $data = $request
+                ->only('firstname', 'email', 'password','lastname','phonenumber');
         $validator = Validator::make($data, [
-            'name' => 'required|string',
+            'firstname' => 'required|string',
             'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:6|max:50'
+            'password' => 'required|string|min:6|max:50',
+            'lastname' => 'required|string',
+            'phonenumber' => 'required|string'
         ]);
 
         //Send failed response if request is not valid
@@ -28,17 +31,30 @@ class AuthController extends Controller
 
         //Request is valid, create new user
         $user = User::create([
-        	'name' => $request->name,
+        	'firstname' => $request->firstname,
         	'email' => $request->email,
-        	'password' => bcrypt($request->password)
+        	'password' => bcrypt($request->password),
+            'lastname' => $request->lastname,
+            'phonenumber' => $request->phonenumber,
+            'cni' => $request->cni,
+            'adresse' => $request->adresse
         ]);
 
+        //get c
         //User created, return success response
-        return response()->json([
-            'success' => true,
-            'message' => 'User created successfully',
-            'data' => $user
-        ], Response::HTTP_OK);
+        if($user){
+            return response()->json([
+                'success' => true,
+                'message' => 'User created successfully',
+                'data' => $user,
+                'login' => $this.login() 
+            ], Response::HTTP_OK);
+        }else{
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'inscription. Veuillez ressayer', 
+            ], Response::HTTP_OK);
+        }
     }
  
     public function authenticate(Request $request)
@@ -108,7 +124,7 @@ class AuthController extends Controller
         }
     }
  
-    public function get_user(Request $request)
+    public function profile(Request $request)
     {
         $this->validate($request, [
             'token' => 'required'

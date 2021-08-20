@@ -15,8 +15,14 @@ class CreateQuartiersTable extends Migration
     {
         Schema::create('quartiers', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('villes_id');
             $table->string('libelle');
             $table->timestamps();
+
+            $table->foreign('villes_id')
+                    ->references('id')
+                    ->on('villes')
+                    ->onDelete('cascade');
         });
     }
 

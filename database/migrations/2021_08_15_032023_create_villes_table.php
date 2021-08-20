@@ -15,8 +15,14 @@ class CreateVillesTable extends Migration
     {
         Schema::create('villes', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('pays_id');
             $table->string('libelle');
             $table->timestamps();
+
+            $table->foreign('pays_id')
+                    ->references('id')
+                    ->on('pays')
+                    ->onDelete('cascade');
         });
     }
 
