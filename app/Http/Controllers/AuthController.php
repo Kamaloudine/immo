@@ -47,7 +47,6 @@ class AuthController extends Controller
                 'success' => true,
                 'message' => 'User created successfully',
                 'data' => $user,
-                'login' => $this.login() 
             ], Response::HTTP_OK);
         }else{
             return response()->json([
@@ -78,7 +77,7 @@ class AuthController extends Controller
             if (! $token = JWTAuth::attempt($credentials)) {
                 return response()->json([
                 	'success' => false,
-                	'message' => 'Login credentials are invalid.',
+                	'message' => 'indentifiant ou le mot de passe incorrect.',
                 ], 400);
             }
         } catch (JWTException $e) {
@@ -98,16 +97,7 @@ class AuthController extends Controller
  
     public function logout(Request $request)
     {
-        //valid credential
-        $validator = Validator::make($request->only('token'), [
-            'token' => 'required'
-        ]);
-
-        //Send failed response if request is not valid
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->messages()], 200);
-        }
-
+       
 		//Request is validated, do logout        
         try {
             JWTAuth::invalidate($request->token);
@@ -126,10 +116,7 @@ class AuthController extends Controller
  
     public function profile(Request $request)
     {
-        $this->validate($request, [
-            'token' => 'required'
-        ]);
- 
+
         $user = JWTAuth::authenticate($request->token);
         
         return response()->json(['user' => $user]);
