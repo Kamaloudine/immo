@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Villes;
+use App\Models\Pays;
 use Illuminate\Http\Request;
 use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -25,7 +26,9 @@ class VillesController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json([
+            'data' => Villes::all()
+        ]);
     }
 
     /**
@@ -47,6 +50,34 @@ class VillesController extends Controller
     public function store(Request $request)
     {
         //
+        $data = $request->only('libelle','pays_id');
+
+        $validation = Validation::make($data,[
+            'libelle' => 'require|string',
+            'pays_id' => 'require'
+        ]);
+
+        if($validation->fail()){
+            return response()->json(['error' => $validation->message()],200);
+        }
+
+        try {
+            $pays = Pays::find($requestè->pays_id)->get();
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'messages' => 'pays non trouver'
+            ],Response::HTTP_OK);
+        }
+
+        $villes = $pays->villes()->create([
+            'libelle' => $request->lebelle
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'data' => $villes
+        ],Response::HTTP_OK);
     }
 
     /**
@@ -55,9 +86,22 @@ class VillesController extends Controller
      * @param  \App\Models\Villes  $villes
      * @return \Illuminate\Http\Response
      */
-    public function show(Villes $villes)
+    public function show($id)
     {
-        //
+        
+        try {
+            $villes = Villes::find($id)->get();
+            return response()->json([
+                'status' => false,
+                'data' => $villes
+            ],Response::HTTP_OK);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'messages' => 'pays non trouver'
+            ],Response::HTTP_OK);
+        }
     }
 
     /**

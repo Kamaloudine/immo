@@ -24,7 +24,9 @@ class PaysController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json([
+            'data' => Pays::all()
+        ]);
     }
 
     /**
@@ -45,7 +47,25 @@ class PaysController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->only('libelle');
+
+        $validation = Validation::make($data,[
+            'libelle' => 'require|string'
+        ]);
+
+        if($validation->fail()){
+            return response()->json(['error' => $validation->message()],200);
+        }
+
+        $pays = Pays::create([
+            'libelle' => $request->lebelle
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'data' => $pays
+        ],Response::HTTP_OK);
+
     }
 
     /**

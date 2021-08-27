@@ -25,7 +25,9 @@ class TypeChambresController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json([
+            'data' => TypeChambres::all()
+        ]);
     }
 
     /**
@@ -46,7 +48,24 @@ class TypeChambresController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->only('libelle');
+
+        $validation = Validation::make($data,[
+            'libelle' => 'require|string'
+        ]);
+
+        if($validation->fail()){
+            return response()->json(['error' => $validation->message()],200);
+        }
+
+        $types = TypesChambres::create([
+            'libelle' => $request->lebelle
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'data' => $types
+        ],Response::HTTP_OK);
     }
 
     /**
@@ -55,9 +74,22 @@ class TypeChambresController extends Controller
      * @param  \App\Models\TypeChambres  $typeChambres
      * @return \Illuminate\Http\Response
      */
-    public function show(TypeChambres $typeChambres)
+    public function show($id)
     {
         //
+        try {
+            $types = TypesChambres::find($id)->get();
+            return response()->json([
+                'status' => false,
+                'data' => $types
+            ],Response::HTTP_OK);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'messages' => 'Types de chambres non trouver'
+            ],Response::HTTP_OK);
+        }
     }
 
     /**
